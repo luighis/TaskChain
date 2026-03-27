@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -17,6 +16,10 @@ import { Card } from "@/components/ui/card";
 import { MilestonesList } from "@/components/dashboard/milestones-list";
 import { ApprovalDialog } from "@/components/dashboard/approval-dialog";
 import { TimelineActivity } from "@/components/dashboard/timeline-activity";
+import {
+  EscrowStatusTracker,
+  type EscrowStage,
+} from "@/components/dashboard/escrow-status-tracker";
 
 interface ProjectDetail {
   id: string;
@@ -81,8 +84,15 @@ const mockProjectDetail: ProjectDetail = {
   ],
 };
 
+const escrowStageByProjectStatus: Record<ProjectDetail["status"], EscrowStage> = {
+  pending: "Funded",
+  "in-progress": "In Progress",
+  "pending-approval": "Submitted",
+  completed: "Released",
+};
+
 export default function ProjectDetailPage() {
-  const params = useParams();
+
   const [showApprovalDialog, setShowApprovalDialog] = useState(false);
   const project = mockProjectDetail;
   const [now] = useState(() => Date.now());
@@ -151,6 +161,10 @@ export default function ProjectDetailPage() {
             </p>
           </Card>
         </div>
+
+        <EscrowStatusTracker
+          currentStage={escrowStageByProjectStatus[project.status]}
+        />
 
         {/* Main Content */}
         <Tabs defaultValue="milestones" className="w-full">
